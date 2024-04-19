@@ -1,5 +1,5 @@
 // components/ProductTable.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -11,28 +11,73 @@ import {
 } from "@mui/material";
 import ProductCell from "./ProductCell";
 
+//product properties
 interface Product {
   id: number;
   title: string;
   image: string;
-  // Add other properties as needed
 }
 
 interface ProductTableProps {
   products: Product[];
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+const ProductTable = ({ products }: ProductTableProps) => {
+  const [selectedCellIndex, setSelectedCellIndex] = useState<number | null>(
     null
   );
-
-  const handleCellClick = (productId: number) => {
-    setSelectedProductId(productId === selectedProductId ? null : productId);
-  };
-
+  const tableRef = useRef<HTMLTableElement>(null);
   const columns = 5;
   const rows = 4;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!selectedCellIndex) return;
+
+      let newIndex: number | null = null;
+
+      switch (event.key) {
+        case "ArrowUp":
+          newIndex =
+            selectedCellIndex - columns > 0
+              ? selectedCellIndex - columns
+              : null;
+          break;
+        case "ArrowDown":
+          newIndex =
+            selectedCellIndex + columns < products.length
+              ? selectedCellIndex + columns
+              : null;
+          break;
+        case "ArrowLeft":
+          newIndex =
+            selectedCellIndex % columns !== 0 ? selectedCellIndex - 1 : null;
+          break;
+        case "ArrowRight":
+          newIndex =
+            (selectedCellIndex + 1) % columns !== 0
+              ? selectedCellIndex + 1
+              : null;
+          break;
+        default:
+          break;
+      }
+
+      if (newIndex !== null) {
+        setSelectedCellIndex(newIndex);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedCellIndex, products]);
+
+  const handleCellClick = (index: number) => {
+    setSelectedCellIndex(index === selectedCellIndex ? null : index);
+  };
 
   const renderCells = () => {
     const cells = [];
@@ -46,7 +91,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
           <ProductCell
             key={product.id}
             product={product}
-            selected={selectedProductId === product.id}
+            selected={selectedCellIndex === product.id}
             onClick={() => handleCellClick(product.id)}
           />
         );
@@ -60,11 +105,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
 
   return (
     <TableContainer component={Paper}>
-      <Table>
+      <Table ref={tableRef}>
         <TableHead>
           <TableRow>
             {[...Array(columns)].map((_, index) => (
-              <TableCell key={index} style={{ border: "1px solid #fff" }}>
+              <TableCell key={index} style={{ border: "1px solid #000" }}>
                 Column {index + 1}
               </TableCell>
             ))}
