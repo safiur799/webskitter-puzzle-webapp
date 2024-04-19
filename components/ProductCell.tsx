@@ -6,7 +6,6 @@ interface Product {
   id: number;
   title: string;
   image: string;
-  // Add other properties as needed
 }
 
 interface ProductCellProps {
