@@ -51,13 +51,11 @@ const ProductTable = ({ products }: ProductTableProps) => {
           break;
         case "ArrowLeft":
           newIndex =
-            selectedCellIndex % columns !== 0 ? selectedCellIndex - 1 : null;
+            selectedCellIndex % columns == 1 ? null : selectedCellIndex - 1;
           break;
         case "ArrowRight":
           newIndex =
-            (selectedCellIndex + 1) % columns !== 0
-              ? selectedCellIndex + 1
-              : null;
+            selectedCellIndex % columns !== 0 ? selectedCellIndex + 1 : null;
           break;
         default:
           break;
