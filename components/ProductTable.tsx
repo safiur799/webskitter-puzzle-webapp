@@ -45,13 +45,19 @@ const ProductTable = ({ products }: ProductTableProps) => {
           break;
         case "ArrowDown":
           newIndex =
-            selectedCellIndex + columns < products.length
+            selectedCellIndex == 15
+              ? selectedCellIndex + columns
+              : selectedCellIndex + columns < products.length
               ? selectedCellIndex + columns
               : null;
           break;
         case "ArrowLeft":
           newIndex =
-            selectedCellIndex % columns == 1 ? null : selectedCellIndex - 1;
+            selectedCellIndex == 15
+              ? selectedCellIndex - 1
+              : selectedCellIndex % columns == 1
+              ? null
+              : selectedCellIndex - 1;
           break;
         case "ArrowRight":
           newIndex =
